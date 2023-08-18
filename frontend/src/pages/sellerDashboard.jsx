@@ -5,17 +5,26 @@ import './sellerDash.css';
 function SellerDashboard() {
   const walletBalance = 5000; // Example wallet balance
   const transactionHistory = [
-    // Transaction history items
-    // Format: { id: 1, description: '...', amount: ... }
+    { id: 1, description: 'coupon sold', amount: +100 },
+    { id: 2, description: 'paid for loyalty', amount: -20 },
+    { id: 3, description: 'Refund', amount: +100 },
+    { id: 4, description: 'xyz', amount: 75 },
+    { id: 5, description: 'zzzz', amount: -150 },
+    { id: 6, description: 'Recieved', amount: 200 },
+    { id: 7, description: 'Flipcoin', amount: -50 },
+    // ... more transactions
   ];
 
+  
+
   const renderTransactionHistory = () => {
-    // Render transaction history items
-    return transactionHistory.map((transaction) => (
-      <Box key={transaction.id} display="flex" justifyContent="space-between" alignItems="center" p={2}>
+    // Render last 5 transaction history items
+    const last5Transactions = transactionHistory.slice(-5); 
+    return last5Transactions.map((transaction) => (
+      <Paper key={transaction.id} elevation={3} className="transaction-box">
         <Typography>{transaction.description}</Typography>
         <Typography>{transaction.amount} USD</Typography>
-      </Box>
+      </Paper>
     ));
   };
 
@@ -45,7 +54,7 @@ function SellerDashboard() {
           <Typography variant="h6">Wallet Balance: {walletBalance} USD</Typography>
           {/* Balance bar */}
           <div className="balance-bar" style={{ width: (walletBalance / 50000) * 100 + '%' }}></div>
-          <Typography variant="body2">Last 10 Transactions:</Typography>
+          <Typography variant="body2">Last 5 Transactions:</Typography>
           <Box mt={2}>
             {renderTransactionHistory()}
           </Box>

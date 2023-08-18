@@ -1,9 +1,9 @@
 /* Seller Dashboard styles */
 .seller-dashboard {
     display: flex;
-    margin-top: 60px;
+    margin-top: 55px;
     height: calc(100vh - 55px);
-    background-color: #3498db; /* Blue color for the background */
+    background-color: #2874f0; 
   }
   
   .left-section {
@@ -13,7 +13,8 @@
     text-align: center;
     padding-top: 160px;
     padding-right: 10px;
-    color: #fff; /* Text color for the left section */
+    background-color: white;
+    color: #fff; 
 }
 
 .right-section {
@@ -22,17 +23,32 @@
     padding-top: 150px;
     text-align: center;
     padding-left: 10px;
-    color: #fff; /* Text color for the right section */
+    color: #fff; 
     border-left: 1px solid white;
   }
   
   .coupon-box {
-    width: calc(20% - 20px); /* Adjust the width based on your design */
+    width: calc(20% - 20px); 
     padding: 20px;
     margin-right: 20px;
     background-color: #fff;
     border: 1px solid #ccc;
   }
+
+  /* Seller Dashboard styles */
+/* ... */
+
+.transaction-box {
+  
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #2874f0;
+  opacity: 90%;
+  border: 1px solid black;
+}
+
+/* ... Other styles */
+
   
   /* ... Other styles */
   
