@@ -152,14 +152,14 @@ const MenuButton = styled(IconButton)(({ theme }) => ({
 }));
 
 // Styled span component
-const CustomButtonWrapper = styled('span')(({ theme }) => ({ 
-    margin: '0 5% 0 auto', 
+const CustomButtonWrapper = styled('span')(({ theme }) => ({
+    margin: '0 5% 0 auto',
     [theme.breakpoints.down('sm')]: {
         display: 'none',
     },
 }));
 
-const Header = () => {
+const Header = ({ web3, connectWeb3 }) => {
     const logoURL = 'https://static-assets-web.flixcart.com/www/linchpin/fk-cp-zion/img/flipkart-plus_8d85f4.png';
     const subURL = 'https://static-assets-web.flixcart.com/www/linchpin/fk-cp-zion/img/plus_aef861.png';
 
@@ -205,9 +205,11 @@ const Header = () => {
                         </SubHeading>
                         <PlusImage src={subURL} alt="Plus" />
                     </Box>
-                    
+
                 </Component>
                 <Search />
+                {web3 ? <span>wallet connected!</span> : <button onClick={connectWeb3}>connect wallet</button>}
+
                 <CustomButtonWrapper>
                     <CustomButtons />
                 </CustomButtonWrapper>

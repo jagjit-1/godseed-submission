@@ -147,7 +147,7 @@ const BlueBoxWithButtons = ({ contract, signer, address }) => {
 
   const [oldTxn, setOldTxn] = useState(null);
   useEffect(() => {
-  
+
 
   }, [address])
 
@@ -202,30 +202,22 @@ const BlueBoxWithButtons = ({ contract, signer, address }) => {
   );
 };
 
-const BlueBoxWithDropdown = ({ contract, signer, address }) => {
+const BlueBoxWithDropdown = ({ web3 }) => {
   const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [balance, setBalance] = useState(null);
 
   useEffect(() => {
-
-    if (signer && contract) {
-      getTokenBalance();
+    const getBalance = async () => {
+      const bal = await web3.getBalance();
+      setBalance(bal);
+    }
+    if (web3) {
+      getBalance()
     }
 
-  }, [signer])
 
-
-  useEffect(() => {
-    if (contract) {
-      contract.on("Transfer", (from, to, _amount, event) => {
-        const amount = ethers.formatUnits(_amount, 18)
-        console.log(`${from} => ${to}: ${amount}`);
-        return () => event.removeListener();
-      });
-    }
-  }, [])
-
+  }, [web3])
   const coupons = [
     { id: 1, title: 'Coupon A', price: 10, description: 'Description of Coupon A', tokenCost: "20", sellerAddress: "0x4d326dA657338De6786736702Bc09612301fc3a7" },
     { id: 2, title: 'Coupon B', price: 20, description: 'Description of Coupon B', tokenCost: "50" },
@@ -239,23 +231,6 @@ const BlueBoxWithDropdown = ({ contract, signer, address }) => {
     setSelectedCoupon(selected);
   };
 
-  const getTokenBalance = async () => {
-    if (contract && signer) {
-
-      const decimals = await contract.decimals();
-      let bal = await contract.balanceOf(address);
-      bal = ethers.formatUnits(bal, decimals)
-      console.log(bal, decimals)
-      setBalance(bal);
-    }
-  }
-  const transferToken = async () => {
-    if (contract) {
-      const transaction = await contract.transfer(selectedCoupon.sellerAddress, ethers.parseEther(selectedCoupon.tokenCost));
-      console.log(transaction)
-
-    }
-  }
 
   const handleRedeemButtonClick = () => {
 
@@ -264,7 +239,8 @@ const BlueBoxWithDropdown = ({ contract, signer, address }) => {
 
   const handleConfirmRedeem = async () => {
     // Perform redeem logic here
-    await transferToken();
+    await web3.initiateTransaction(selectedCoupon.sellerAddress, selectedCoupon.tokenCost);
+    console.log(web3.lastTransaction());
     setIsConfirmationOpen(false);
     setSelectedCoupon(null); // Clear selected coupon
   };
@@ -338,11 +314,11 @@ const BlueBoxWithDropdown = ({ contract, signer, address }) => {
   );
 };
 
-const YourPage = ({ contract, signer, address }) => {
+const YourPage = ({ web3 }) => {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: "1fr 1fr", width: "100%", border: "1px solid black" }}>
-      <BlueBoxWithButtons contract={contract} signer={signer} address={address} />
-      <BlueBoxWithDropdown contract={contract} signer={signer} address={address} />
+      <BlueBoxWithButtons web3={web3} />
+      <BlueBoxWithDropdown web3={web3} />
     </div>
   );
 };
