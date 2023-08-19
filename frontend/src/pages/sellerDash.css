@@ -17,7 +17,8 @@
     color: #fff; 
 }
 
-.right-section {
+
+  .right-section {
     flex: 1;
     padding-right: 50px;
     padding-top: 150px;
@@ -45,8 +46,24 @@
   background-color: #2874f0;
   opacity: 90%;
   border: 1px solid black;
+  color: white;
 }
 
+.offer-tokens-section {
+  background-color: #fff; /* White background */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2); /* Shadow effect */
+  position: absolute; /* Positioned at the bottom */
+  bottom: 20px;
+  left: 75%;
+  transform: translateX(-50%);
+  max-width: 80%; /* Limit the maximum width */
+}
+
+.offer-tokens-section h6 {
+  margin-bottom: 10px;
+}
 /* ... Other styles */
 
   
