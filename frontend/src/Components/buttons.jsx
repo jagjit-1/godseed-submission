@@ -355,31 +355,16 @@
 
 
 import React, { useEffect, useState } from 'react';
-import { Box, Button, MenuItem, Select, Typography, Grid, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Alert } from '@mui/material';
+import { Box, Button, MenuItem, Select, Typography, Paper, FormControl, InputLabel, Grid, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Alert } from '@mui/material';
 import { CircularProgress } from '@mui/material';
 
 import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { ethers } from 'ethers';
+import '../pages/sellerDash.css';
 
 const BlueBoxWithButtons = ({ contract, signer, address }) => {
 
   const [oldTxn, setOldTxn] = useState(null);
-  useEffect(() => {
 
-
-  }, [address])
-
-  const getPreviousTransactions = async () => {
-    if (contract) {
-      const filter = contract.filters.Transfer(address);
-      const other = contract.filters.Transfer(null, address)
-      const events = await contract.queryFilter(filter, -100);
-      const otherEvents = await contract.queryFilter(other, -100)
-      console.log(events, otherEvents, "events")
-      setOldTxn(events);
-    }
-  }
   return (
     <Box
       bgcolor="white"
@@ -425,25 +410,51 @@ const BlueBoxWithDropdown = ({ web3 }) => {
   const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [balance, setBalance] = useState(null);
-
+  const [transactions, setTransactions] = useState([]);
+  const [transactionsType, setTransactionsType] = useState("Credit");
+  const [sliceCount, setSliceCount] = useState(-5);
   useEffect(() => {
-    const getBalance = async () => {
+    const getDetails = async () => {
       const bal = await web3.getBalance();
+      const newTransactions = await web3.queryEvents("TRANSFER", transactionsType);
+      console.log(newTransactions)
       setBalance(bal);
+      setTransactions(newTransactions);
     }
     if (web3) {
-      getBalance()
+      getDetails()
     }
 
 
-  }, [web3])
+  }, [web3, transactionsType])
+  const handleTransactionTypeChange = (event) => {
+    setTransactionsType(event.target.value);
+  };
+  const renderTransactionHistory = () => {
+    const last5Transactions = transactions.slice(sliceCount);
+    return last5Transactions.map((transaction, idx) => (
+      <Paper key={idx} elevation={3} className="transaction-box">
+        <Typography>From: {transaction.from}</Typography>
+        <Typography>To: {transaction.to}</Typography>
+        <Typography>Value: {transaction.value} FT</Typography>
+      </Paper>
+
+    ));
+  };
   const coupons = [
-    { id: 1, title: 'Coupon A', price: 10, description: 'Description of Coupon A', tokenCost: "20", sellerAddress: "0x4d326dA657338De6786736702Bc09612301fc3a7" },
+    { id: 1, title: 'Coupon A', price: 10, description: 'Description of Coupon A', tokenCost: "20", sellerAddress: "0xe038C8729ca3d23938fcc666300B990E2865D69e" },
     { id: 2, title: 'Coupon B', price: 20, description: 'Description of Coupon B', tokenCost: "50" },
     { id: 3, title: 'Coupon C', price: 15, description: 'Description of Coupon C', tokenCost: "30" },
     // Add more coupons as needed
   ];
 
+  const getDetails = async () => {
+    const bal = await web3.getBalance();
+    const newTransactions = await web3.queryEvents("TRANSFER", transactionsType);
+    console.log(newTransactions)
+    setBalance(bal);
+    setTransactions(newTransactions);
+  }
   const handleCouponSelect = (event) => {
     const selectedId = event.target.value;
     const selected = coupons.find((coupon) => coupon.id === selectedId);
@@ -451,10 +462,6 @@ const BlueBoxWithDropdown = ({ web3 }) => {
   };
 
 
-  const handleRedeemButtonClick = () => {
-
-    setIsConfirmationOpen(true);
-  };
   const [isRedeeming, setIsRedeeming] = useState(false);
 
   const handleConfirmRedeem = async () => {
@@ -465,9 +472,7 @@ const BlueBoxWithDropdown = ({ web3 }) => {
       await web3.initiateTransaction(selectedCoupon.sellerAddress, selectedCoupon.tokenCost);
       await web3.lastTransaction.wait();
       console.log("Transaction complete");
-
-      const bal = await web3.getBalance();
-      setBalance(bal);
+      await getDetails();
     } catch (error) {
       console.error("Error during redemption:", error);
     } finally {
@@ -492,11 +497,34 @@ const BlueBoxWithDropdown = ({ web3 }) => {
       flexDirection="column"
       padding="2rem"
     >
-      {
-        balance && (
-          <Typography variant='h5' style={{ color: "white", marginBottom: "20px" }}>FT Balance: {balance}</Typography>
-        )
-      }
+      <br />
+      <br />
+      <Paper style={{ padding: "10px", textAlign: "center", maxHeight: "700px", overflowY: "scroll" }} elevation={3} className="left-box">
+
+        <FormControl>
+          <InputLabel id="demo-simple-select-label">Type</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={transactionsType}
+            label="Type"
+            onChange={handleTransactionTypeChange}
+          >
+            <MenuItem value={"Credit"}>Credit</MenuItem>
+            <MenuItem value={"Debit"}>Debit</MenuItem>
+          </Select>
+        </FormControl>
+        <Typography variant="h6">Wallet Balance: {balance} USD</Typography>
+        {/* Balance bar */}
+        {/* {<div className="balance-bar" style={{ width: (walletBalance / 50000) * 100 + '%' }}></div>} */}
+        <Typography variant="body2">Last {-sliceCount} Transactions:</Typography>
+        <Box mt={2}>
+          {renderTransactionHistory()}
+        </Box>
+        <Box mt={2} textAlign="center">
+          <Button onClick={() => setSliceCount(sliceCount - 5)} variant="contained">Load More</Button>
+        </Box>
+      </Paper>
       <Select
         variant="outlined"
         color="primary"
@@ -553,6 +581,8 @@ const BlueBoxWithDropdown = ({ web3 }) => {
           </Button>
         </DialogActions>
       </Dialog>
+
+
     </Box>
   );
 };

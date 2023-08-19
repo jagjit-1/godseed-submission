@@ -4,7 +4,6 @@ import Header from './Components/Header/Header';
 import BuyerDashboard from './Components/buttons'; // Import the BlueBoxWithButtons component
 import SellerDashboard from './pages/sellerDashboard';
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { ethers } from 'ethers'
 import contractABI from './abi.json'
 import Web3Abstraction from './utils/web3Utils';
 
@@ -25,7 +24,7 @@ function App() {
     <BrowserRouter>
       <Header web3={web3} connectWeb3={connectWeb3} />
       <Routes>
-        <Route index path="/seller" element={<SellerDashboard />} />
+        <Route index path="/seller" element={<SellerDashboard web3={web3} />} />
         <Route path="/buyer" element={<BuyerDashboard web3={web3} />} />
       </Routes>
     </BrowserRouter>

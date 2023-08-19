@@ -1,6 +1,9 @@
 import { ethers } from "ethers";
 import axios from "axios";
-import { Network, Alchemy } from "alchemy-sdk";
+
+const eventHashMap = {
+    "TRANSFER": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+}
 
 class Web3Abstraction {
     constructor(contractAddress, contractABI) {
@@ -58,29 +61,70 @@ class Web3Abstraction {
         }
     }
 
-    queryEvents = async () => {
-        // const settings = {
-        //     apiKey: process.env.ALCHEMY_API,
-        //     network: Network.MATIC_MUMBAI,
-        // };
-        // const alchemy = new Alchemy(settings);
-        // const currentBlock = alchemy.core.getBlockNumber();
-        // const res = await alchemy.core
-        //     .getLogs({
-        //         toBlock:currentBlock
-        //     })
-        // console.log(res);
-        // console.log(this.network)
-        // console.log(process.env.ALCHEMY_API)
-        // const testprovider = ethers.getDefaultProvider(this.network.name, {
-        //     alchemy: process.env.ALCHEMY_API,
-        // });
-        // const filters = this.contract.filters.Transfer(null, this.address, null);
-        // console.log(filters)
-        // const events = await testprovider.getLogs({ topics: ["0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "0x000000000000000000000000e76c660b4d44ba18cc86d2ab8bcc21f4f2d9e44f", "0x0000000000000000000000004d326da657338de6786736702bc09612301fc3a7"] })
-        // console.log(events)
+    decodeEventLog = (logs) => {
+        logs = logs || [];
+        const abi = ["event Transfer(address indexed from, address indexed to, uint256 value)"]
+        const iface = new ethers.Interface(abi);
+        return logs.map((log) => {
+            const [from, to, value] = iface.parseLog(log).args;
+            return {
+                from,
+                to,
+                value: ethers.formatUnits(value, 18)
+            }
+        });
+    }
+
+    queryEvents = async (event = "TRANSFER", type = "CREDIT") => {
+        event = event.toUpperCase();
+        type = type.toUpperCase();
+        console.log(event, type, "iefnsofbsouefbosubefusbfe!!!!!!!!")
+        if (eventHashMap[event]) {
+
+            if (type === "CREDIT") {
+                // CREDIT CASE
+
+                console.log("what", this.address, ethers.zeroPadValue(this.address, 32));
+                const res = await axios.get("https://api-testnet.polygonscan.com/api", {
+                    params: {
+                        module: "logs",
+                        action: "getLogs",
+                        address: this.contractAddress,
+                        topic0: eventHashMap[event],
+                        topic0_1_opr: "and",
+                        topic1: null,
+                        topic1_2_opr: "and",
+                        topic2: ethers.zeroPadValue(this.address, 32),
+                        apikey: "2MKTXY9VSCCQACFHIPQXNUFD634TJYCTQS"
+                    }
+                })
+                return this.decodeEventLog(res.data.result);
+            }
+            else {
+                // DEBIT CASE
+
+                console.log("heinjijijijiji")
+                const res = await axios.get("https://api-testnet.polygonscan.com/api", {
+                    params: {
+                        module: "logs",
+                        action: "getLogs",
+                        address: this.contractAddress,
+                        topic0: eventHashMap[event],
+                        topic0_1_opr: "and",
+                        topic1: ethers.zeroPadValue(this.address, 32),
+                        apikey: "2MKTXY9VSCCQACFHIPQXNUFD634TJYCTQS"
+                    }
+                })
+                
+                return this.decodeEventLog(res.data.result);
 
 
+            }
+
+        }
+        else {
+            throw new Error("Invalid event");
+        }
 
     }
 
