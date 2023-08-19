@@ -138,7 +138,7 @@
 // export default YourPage;
 
 import React, { useEffect, useState } from 'react';
-import { Box, Button, MenuItem, Select, Typography, Grid, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Box, Button, MenuItem, Select, Typography, Grid, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Alert } from '@mui/material';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { ethers } from 'ethers';
@@ -240,7 +240,10 @@ const BlueBoxWithDropdown = ({ web3 }) => {
   const handleConfirmRedeem = async () => {
     // Perform redeem logic here
     await web3.initiateTransaction(selectedCoupon.sellerAddress, selectedCoupon.tokenCost);
-    console.log(web3.lastTransaction());
+    await web3.lastTransaction.wait();
+    console.log("abb hua transactions complete")
+    const bal = await web3.getBalance();
+    setBalance(bal);
     setIsConfirmationOpen(false);
     setSelectedCoupon(null); // Clear selected coupon
   };

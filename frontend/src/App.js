@@ -17,6 +17,7 @@ function App() {
     const web3 = new Web3Abstraction(contractAddress, contractABI);
     await web3.connectWallet();
     await web3.connectContract();
+    await web3.queryEvents();
     setWeb3(web3);
   }
   console.log(web3)
