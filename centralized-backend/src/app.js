@@ -3,15 +3,17 @@ const { abi } = require("./abi");
 const { Web3 } = require("web3");
 const dotenv = require("dotenv");
 const express = require("express");
+const axios = require("axios"); 
 
 const app = express();
 dotenv.config();
 
 app.use(express.json());
 
-const { PROVIDERURL, CONTRACT_ADDRESS, OWNER_PRIVATE_ADDRESS } = process.env;
+const { PROVIDERURL, CONTRACT_ADDRESS, OWNER_PRIVATE_ADDRESS, FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = process.env;
 const PORT = 5000;
-
+console.log(PROVIDERURL);
+console.log(process.env);
 const web3 = new Web3(new Web3.providers.WebsocketProvider(PROVIDERURL));
 const senderAccount = web3.eth.accounts.privateKeyToAccount(OWNER_PRIVATE_ADDRESS);
 const contract = new web3.eth.Contract(abi, CONTRACT_ADDRESS);
@@ -81,6 +83,82 @@ const checkBalance = async (address) => {
     const balance = await contract.methods.balanceOf(address).call();
     return web3.utils.fromWei(balance, 'ether');
 }
+
+
+
+
+// facebook login: OAuth and API
+
+app.get("/auth/facebook", (req, res) => {
+    console.log("hehe");
+    const clientID = "181790724922829"; // Your Facebook App ID
+    const redirectUri = encodeURIComponent("http://localhost:3000/auth/facebook/callback");
+    const authUrl = `https://www.facebook.com/v12.0/dialog/oauth?client_id=${clientID}&redirect_uri=${redirectUri}&scope=email,user_friends`;
+    res.redirect(authUrl);
+  });
+  
+  app.get("/auth/facebook/callback", async (req, res) => {
+    const { code } = req.query;
+    try {
+      const clientID = "181790724922829"; // Your Facebook App ID
+      const clientSecret = "YOUR_CLIENT_SECRET"; // Your Facebook App Secret
+      const redirectUri = encodeURIComponent("http://localhost:3000/auth/facebook/callback");
+      
+      // Exchange code for access token
+      const response = await axios.get(
+        `https://graph.facebook.com/v12.0/oauth/access_token?client_id=${clientID}&redirect_uri=${redirectUri}&client_secret=${clientSecret}&code=${code}`
+      );
+  
+      const accessToken = response.data.access_token;
+  
+      // Store the accessToken or use it directly for API calls
+      console.log("Access Token:", accessToken);
+  
+      // You can redirect the user or send a response back
+      res.send("Connected to Facebook!");
+    } catch (error) {
+      console.error("Error exchanging code for access token:", error);
+      res.status(500).send("Failed to connect with Facebook");
+    }
+  });
+  
+  
+  app.post("/user/fetchFacebookProfile", async (req, res) => {
+    try {
+        const userAccessToken = req.body.userAccessToken; // Assuming you send the user access token from the frontend
+        const fields = "id,name,email"; // Specify the fields you want to retrieve
+
+        // Make a GET request to Facebook's API to fetch the user's profile using the user access token
+        const response = await axios.get(`https://graph.facebook.com/v12.0/me?fields=${fields}`, {
+            headers: {
+                Authorization: `Bearer ${userAccessToken}`, // Include the user access token in the headers
+            },
+        });
+
+        const userData = response.data;
+        res.status(200).json(userData);
+    } catch (err) {
+        console.log(err);
+        res.sendStatus(500);
+    }
+});
+
+
+  app.get("/user/facebook-data", async (req, res) => {
+    const accessToken = "YOUR_USER_ACCESS_TOKEN"; // Replace with the user's access token
+    try {
+      // Example: Get user's profile information
+      const response = await axios.get(
+        `https://graph.facebook.com/me?fields=id,name,email&access_token=${accessToken}`
+      );
+  
+      const userData = response.data;
+      res.status(200).json(userData);
+    } catch (error) {
+      console.error("Error fetching Facebook user data:", error);
+      res.status(500).send("Failed to fetch Facebook user data");
+    }
+  });
 
 
 
