@@ -10,8 +10,7 @@ dotenv.config();
 app.use(express.json());
 
 const { PROVIDERURL, CONTRACT_ADDRESS, OWNER_PRIVATE_ADDRESS } = process.env;
-
-console.log(OWNER_PRIVATE_ADDRESS)
+const PORT = 5000;
 
 const web3 = new Web3(new Web3.providers.WebsocketProvider(PROVIDERURL));
 const senderAccount = web3.eth.accounts.privateKeyToAccount(OWNER_PRIVATE_ADDRESS);
@@ -85,4 +84,4 @@ const checkBalance = async (address) => {
 
 
 
-app.listen(3000, () => console.log("server up on", 3000));
+app.listen(PORT, () => console.log("server up on", PORT));

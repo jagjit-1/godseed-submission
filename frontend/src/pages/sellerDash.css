@@ -1,7 +1,8 @@
 /* Seller Dashboard styles */
 .seller-dashboard {
     display: flex;
-    height: 100%;
+    justify-content: center;
+    min-height: 100vh;
     background-color: #2874f0; 
   }
   

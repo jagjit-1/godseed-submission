@@ -108,7 +108,7 @@
 // export default Header;
 
 import React, { useState } from 'react'; // Don't forget to import React
-import { AppBar, Toolbar, Box, Typography, IconButton, Drawer, List, styled } from '@mui/material';
+import { AppBar, Toolbar, Box, Typography, IconButton, Drawer, List, styled, ButtonGroup } from '@mui/material';
 import { Menu } from '@mui/icons-material';
 import { ListItem } from '@mui/material';
 import { Link } from 'react-router-dom';
@@ -205,11 +205,11 @@ const Header = ({ web3, connectWeb3 }) => {
                         </SubHeading>
                         <PlusImage src={subURL} alt="Plus" />
                     </Box>
-
                 </Component>
-                <Search />
-                {web3 ? <span>wallet connected!</span> : <button onClick={connectWeb3}>connect wallet</button>}
-
+                <ButtonGroup style={{ margin: "2px 4px 2px 9rem", display: "flex", justifyContent: "space-between", minWidth: "500px" }}>
+                    <Button onClick={connectWeb3} disabled={web3 ? true : false} variant='contained'>{web3 ? "Wallet Connected" : "Connect Wallet"}</Button>
+                    <Button variant='contained'>Download Tokenomics</Button>
+                </ButtonGroup>
                 <CustomButtonWrapper>
                     <CustomButtons />
                 </CustomButtonWrapper>

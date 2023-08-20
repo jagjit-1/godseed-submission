@@ -63,13 +63,6 @@ const CustomButtons = () => {
 
     return (
         <Wrapper>
-
-            {/* button for downloading tokenomics */}
-            
-            <Button variant="contained" style={{padding: 1, margin: 1}}>Download Tokenomics</Button>
-            
-            {/* dead buttons */}
-
             <Typography style={{ marginTop: 10, width: 135 }}>Become a Seller</Typography>
             <Typography style={{ marginTop: 10 }}>More</Typography>
             
@@ -79,7 +72,6 @@ const CustomButtons = () => {
                 </Badge>
                 <Typography style={{ marginLeft: 10 }}>Cart</Typography>
             </Container>
-            
         </Wrapper>
     )
 }

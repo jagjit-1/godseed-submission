@@ -83,20 +83,30 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { Box, Paper, Typography, Button, FormControl, InputLabel, MenuItem, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
+import { Box, Paper, Typography, Button, CircularProgress, Backdrop, FormControl, InputLabel, MenuItem, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
 import './sellerDash.css';
 
 function SellerDashboard({ web3 }) {
   const [balance, setBalance] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [transactionsType, setTransactionsType] = useState("Credit");
+  const [isRedeeming, setIsRedeeming] = useState(false);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     const getDetails = async () => {
-      const bal = await web3.getBalance();
-      const newTransactions = await web3.queryEvents("TRANSFER", transactionsType);
-      console.log(newTransactions)
-      setBalance(bal);
-      setTransactions(newTransactions);
+      try {
+        setLoading(true);
+        const bal = await web3.getBalance();
+        const newTransactions = await web3.queryEvents("TRANSFER", transactionsType);
+        setBalance(bal);
+        setTransactions(newTransactions);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
+
+
     }
     if (web3) {
       getDetails()
@@ -115,7 +125,6 @@ function SellerDashboard({ web3 }) {
   const getDetails = async () => {
     const bal = await web3.getBalance();
     const newTransactions = await web3.queryEvents("TRANSFER", transactionsType);
-    console.log(newTransactions)
     setBalance(bal);
     setTransactions(newTransactions);
   }
@@ -130,20 +139,29 @@ function SellerDashboard({ web3 }) {
 
   const handleOfferTokens = async () => {
     // Perform the action to offer tokens to the selected customer
-    await web3.initiateTransaction(selectedCustomer.customerAddress, offeredTokens);
-    await web3.lastTransaction.wait();
-    await getDetails();
-    setSelectedCustomer(null);
+    try {
+      setIsRedeeming(true);
+      await web3.initiateTransaction(selectedCustomer.customerAddress, offeredTokens);
+      await web3.lastTransaction.wait();
+      setLoading(true);
+      await getDetails();
+    } catch (err) {
+      console.log("Error in transactions")
+    } finally {
+      setSelectedCustomer(null);
+      setLoading(false);
+      setIsRedeeming(false);
+    }
   };
 
   const renderTransactionHistory = () => {
-    const last5Transactions = transactionHistory.slice(-5);
-    return last5Transactions.map((transaction) => (
-      <Paper key={transaction.id} elevation={3} className="transaction-box">
-        <Typography>{transaction.description}</Typography>
-        <Typography>{transaction.amount}FT</Typography>
+    const last5Transactions = transactions.slice(sliceCount);
+    return last5Transactions.map((transaction, idx) => (
+      <Paper key={idx} elevation={3} className="transaction-box">
+        <Typography><strong>From: </strong>{transaction.from}</Typography>
+        <Typography><strong>To: </strong>{transaction.to}</Typography>
+        <Typography><strong>Value: </strong>{transaction.value} FT</Typography>
       </Paper>
-
     ));
   };
   const handleTransactionTypeChange = (event) => {
@@ -153,13 +171,30 @@ function SellerDashboard({ web3 }) {
   return (
     <div className="seller-dashboard">
       <div className="left-section">
-        <Paper elevation={3} className="left-box">
-          <Typography variant="h6">Wallet Balance: {walletBalance} FT</Typography>
+        <Paper style={{ padding: "10px", textAlign: "center", maxHeight: "700px", overflowY: "scroll", maxWidth: "80%", margin: "auto" }} elevation={3} className="left-box">
+          <FormControl>
+            <InputLabel id="demo-simple-select-label">Type</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={transactionsType}
+              label="Type"
+              onChange={handleTransactionTypeChange}
+            >
+              <MenuItem value={"Credit"}>Credit</MenuItem>
+              <MenuItem value={"Debit"}>Debit</MenuItem>
+            </Select>
+          </FormControl>
+          <Typography variant="h6">Wallet Balance: {balance} FT</Typography>
           {/* Balance bar */}
           {/* {<div className="balance-bar" style={{ width: (walletBalance / 50000) * 100 + '%' }}></div>} */}
           <Typography variant="body2">Last {-sliceCount} Transactions:</Typography>
           <Box mt={2}>
+            <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={loading}>
+              <CircularProgress color="inherit" />
+            </Backdrop>
             {renderTransactionHistory()}
+
           </Box>
           <Box mt={2} textAlign="center">
             <Button onClick={() => setSliceCount(sliceCount - 5)} variant="contained">Load More</Button>
@@ -203,8 +238,14 @@ function SellerDashboard({ web3 }) {
               value={offeredTokens}
               onChange={(e) => setOfferedTokens(e.target.value)}
               fullWidth
+              style={{ paddingBottom: "20px" }}
             />
-            <Button variant="contained" color="primary" onClick={handleOfferTokens}>Submit</Button>
+            {isRedeeming ? (
+              <CircularProgress size={24} /> // Show loading icon if redeeming
+            ) : (
+              <Button variant="contained" color="primary" onClick={handleOfferTokens}>Submit</Button>
+            )}
+
           </Box>
         )}
       </div>
