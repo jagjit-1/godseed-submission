@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; 
+import React, { useState } from 'react';
 import { AppBar, Toolbar, Box, Typography, IconButton, Drawer, List, styled, ButtonGroup } from '@mui/material';
 import { Menu } from '@mui/icons-material';
 import { ListItem } from '@mui/material';
@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@mui/material';
 import CustomButtons from './CustomButtons';
 import Search from './Search';
+import token from "./token.pdf";
 
 // Styled AppBar component
 const StyledHeader = styled(AppBar)`
@@ -73,25 +74,18 @@ const Header = ({ web3, connectWeb3 }) => {
             </List>
         </Box>
     );
-    
-        const handleDownloadClick = () => {
-         
-          const pdfUrl = process.env.PUBLIC_URL + '/path/to/your/pdf/tokenomics.pdf';
-          
-        
-          const link = document.createElement('a');
-          link.href = pdfUrl;
-          link.target = '_blank'; 
-          link.download = 'tokenomics.pdf'; 
-          
-          
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link); 
-      
-          
-        };
-    
+
+    const handleDownloadClick = () => {
+
+        const link = document.createElement('a');
+        link.href = token;
+        link.target = '_blank'; // Open the link in a new tab/window
+        link.download = 'tokenomics.pdf'; // Specify the filename for download
+        link.click();
+
+
+    };
+
 
     return (
         <StyledHeader position="fixed">
@@ -119,8 +113,8 @@ const Header = ({ web3, connectWeb3 }) => {
                 <ButtonGroup style={{ margin: "2px 4px 2px 9rem", display: "flex", justifyContent: "space-between", minWidth: "500px" }}>
                     <Button onClick={connectWeb3} disabled={web3 ? true : false} variant='contained'>{web3 ? "Wallet Connected" : "Connect Wallet"}</Button>
                     <Button variant="contained" onClick={handleDownloadClick}>
-                            Download Tokenomics
-                        </Button>
+                        Download Tokenomics
+                    </Button>
                 </ButtonGroup>
                 <CustomButtonWrapper>
                     <CustomButtons />
