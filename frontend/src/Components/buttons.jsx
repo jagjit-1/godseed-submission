@@ -11,7 +11,7 @@
 //     return (
 //         <Box
 //             bgcolor="white"
-//             width="100%"
+//             width="100%"  
 //             minHeight="100vh"
 //             // display="flex"
 //             alignItems="center"
@@ -346,10 +346,9 @@
 // ***************************************************************************
 // ***************************************************************************
 // ***************************************************************************
+// ***************************************************************************f
 // ***************************************************************************
 // ***************************************************************************
-// ***************************************************************************
-
 
 
 
@@ -357,13 +356,33 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, MenuItem, Select, Typography, Paper, FormControl, InputLabel, Grid, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Alert } from '@mui/material';
 import { CircularProgress } from '@mui/material';
-
+import {Snackbar } from '@mui/material';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Link } from 'react-router-dom';
 import '../pages/sellerDash.css';
+
+
+
 
 const BlueBoxWithButtons = ({ contract, signer, address }) => {
 
   const [oldTxn, setOldTxn] = useState(null);
+  // const [isRedeeming, setIsRedeeming] = useState(false);
+  
+  const [isCopying, setIsCopying] = useState(false);
+  const [showLink, setShowLink] = useState(false);
+  const handleCopyClick = () => {
+    setIsCopying(true);
+    setTimeout(() => {
+      setIsCopying(false);
+      setShowLink(true);
+    }, 1000);
+  };
+
+
+  
+
+  
 
   return (
     <Box
@@ -379,17 +398,45 @@ const BlueBoxWithButtons = ({ contract, signer, address }) => {
     >
       <Grid container spacing={2}>
         <Grid item xs={6}>
-          <Button variant="contained" color="primary">
-            Generate Referral Link
-          </Button>
-        </Grid>
-        <Grid item xs={6}>
-          <Link to="https://www.flipkart.com" target="_blank" style={{ textDecoration: 'none' }}>
-            <Button variant="contained" color="primary">
-              Shop and earn tokens
+          {showLink ? (
+            <Box>
+              <Typography variant="h6">Your Referral Link:</Typography>
+              <Link
+                href="https://www.flipkart.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://www.flipkart.com
+              </Link>
+              <CopyToClipboard text="https://www.flipkart.com">
+                <Button variant="outlined" color="primary" style={{ marginTop: '10px' }}>
+                  Copy Link
+                </Button>
+              </CopyToClipboard>
+            </Box>
+          ) : (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleCopyClick}
+              disabled={isCopying}
+            >
+              {isCopying ? (
+                <CircularProgress size={24} />
+              ) : (
+                'Generate Referral Link'
+              )}
             </Button>
-          </Link>
+          )}
         </Grid>
+        
+        <Grid item xs={6}>
+      <Link to="https://www.flipkart.com" target="_blank" style={{ textDecoration: 'none' }}>
+        <Button variant="contained" color="primary">
+              Shop and Earn Tokens
+        </Button>
+      </Link>
+    </Grid>
         <Grid item xs={6}>
           <Button variant="contained" color="primary">
             Earn3
@@ -406,13 +453,17 @@ const BlueBoxWithButtons = ({ contract, signer, address }) => {
   );
 };
 
+ 
+
+//right section
 const BlueBoxWithDropdown = ({ web3 }) => {
   const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [balance, setBalance] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [transactionsType, setTransactionsType] = useState("Credit");
-  const [sliceCount, setSliceCount] = useState(-5);
+  const [sliceCount, setSliceCount] = useState(-5);  
+
   useEffect(() => {
     const getDetails = async () => {
       const bal = await web3.getBalance();
@@ -465,7 +516,7 @@ const BlueBoxWithDropdown = ({ web3 }) => {
   const [isRedeeming, setIsRedeeming] = useState(false);
 
   const handleConfirmRedeem = async () => {
-    setIsRedeeming(true); // Set loading state
+    setIsRedeeming(true); 
 
     try {
       // Perform redeem logic here
@@ -485,6 +536,8 @@ const BlueBoxWithDropdown = ({ web3 }) => {
   const handleCloseConfirmation = () => {
     setIsConfirmationOpen(false);
   };
+  
+  
 
   return (
     <Box
@@ -525,6 +578,7 @@ const BlueBoxWithDropdown = ({ web3 }) => {
           <Button onClick={() => setSliceCount(sliceCount - 5)} variant="contained">Load More</Button>
         </Box>
       </Paper>
+
       <Select
         variant="outlined"
         color="primary"
@@ -597,4 +651,5 @@ const YourPage = ({ web3 }) => {
 };
 
 export default YourPage;
+
 

@@ -137,12 +137,11 @@ function SellerDashboard({ web3 }) {
   };
 
   const renderTransactionHistory = () => {
-    const last5Transactions = transactions.slice(sliceCount);
-    return last5Transactions.map((transaction, idx) => (
-      <Paper key={idx} elevation={3} className="transaction-box">
-        <Typography>From: {transaction.from}</Typography>
-        <Typography>To: {transaction.to}</Typography>
-        <Typography>Value: {transaction.value} FT</Typography>
+    const last5Transactions = transactionHistory.slice(-5);
+    return last5Transactions.map((transaction) => (
+      <Paper key={transaction.id} elevation={3} className="transaction-box">
+        <Typography>{transaction.description}</Typography>
+        <Typography>{transaction.amount}FT</Typography>
       </Paper>
 
     ));
@@ -154,21 +153,8 @@ function SellerDashboard({ web3 }) {
   return (
     <div className="seller-dashboard">
       <div className="left-section">
-        <Paper style={{ padding: "10px", textAlign: "center", maxHeight: "700px", overflowY: "scroll", maxWidth:"80%", margin:"auto" }} elevation={3} className="left-box">
-          <FormControl>
-            <InputLabel id="demo-simple-select-label">Type</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={transactionsType}
-              label="Type"
-              onChange={handleTransactionTypeChange}
-            >
-              <MenuItem value={"Credit"}>Credit</MenuItem>
-              <MenuItem value={"Debit"}>Debit</MenuItem>
-            </Select>
-          </FormControl>
-          <Typography variant="h6">Wallet Balance: {balance} USD</Typography>
+        <Paper elevation={3} className="left-box">
+          <Typography variant="h6">Wallet Balance: {walletBalance} FT</Typography>
           {/* Balance bar */}
           {/* {<div className="balance-bar" style={{ width: (walletBalance / 50000) * 100 + '%' }}></div>} */}
           <Typography variant="body2">Last {-sliceCount} Transactions:</Typography>
@@ -188,7 +174,7 @@ function SellerDashboard({ web3 }) {
               <TableHead>
                 <TableRow>
                   <TableCell>Name</TableCell>
-                  <TableCell>Spending (USD)</TableCell>
+                  <TableCell>Spending (INR)</TableCell>
                   <TableCell>Shopping Frequency</TableCell>
                   <TableCell>Action</TableCell>
                 </TableRow>

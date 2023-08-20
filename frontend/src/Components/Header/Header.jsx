@@ -198,9 +198,9 @@ const Header = ({ web3, connectWeb3 }) => {
                     <img src={logoURL} style={{ width: 75 }} alt="Logo" />
                     <Box component="span" style={{ display: 'flex' }}>
                         <SubHeading>
-                            Explore&nbsp;
+                            Flip&nbsp;
                             <Box component="span" style={{ color: '#FFE500' }}>
-                                Plus
+                                Token
                             </Box>
                         </SubHeading>
                         <PlusImage src={subURL} alt="Plus" />
