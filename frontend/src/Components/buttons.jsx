@@ -510,7 +510,7 @@
 
 
 import React, { useEffect, useState } from 'react';
-import { Box, Button, MenuItem, Select, Backdrop, Typography, Paper, FormControl, InputLabel, Grid, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Alert , Link} from '@mui/material';
+import { Box, Button, MenuItem, Select, Backdrop, Typography, Paper, FormControl, InputLabel, Grid, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Alert, Link } from '@mui/material';
 import { CircularProgress } from '@mui/material';
 import { Snackbar } from '@mui/material';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -537,7 +537,7 @@ const BlueBoxWithButtons = ({ web3, setRedeemed }) => {
       setShowLink(true);
     }, 1000);
 
-   
+
   };
 
 
@@ -581,39 +581,40 @@ const BlueBoxWithButtons = ({ web3, setRedeemed }) => {
 
   // for logging into social media
   const [isSocialMediaDialogOpen, setIsSocialMediaDialogOpen] = useState(false);
-const [connectingTo, setConnectingTo] = useState(null);
-const [isConnecting, setIsConnecting] = useState(false);
-// const handleSocialMediaConnect = (platform) => {
-//   setIsSocialMediaDialogOpen(true);
-//   setConnectingTo(platform);
-// };
+  const [socialConnected, setSocialConnected] = useState(false);
+  const [connectingTo, setConnectingTo] = useState(null);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [connectedSocial, setConnectedSocial] = useState(false);
+  // const handleSocialMediaConnect = (platform) => {
+  //   setIsSocialMediaDialogOpen(true);
+  //   setConnectingTo(platform);
+  // };
 
-const handleSocialMediaConnect = async () => {
-  try {
+  const handleSocialMediaConnect = async () => {
+    try {
+      setIsConnecting(true);
+      const res = await axios.post("http://localhost:5000/seller/mintRewards", { token: 5, recieverAddress: web3.address });
+      setRedeemed((val) => val + 1);
+      setConnectedSocial(true);
+      // Redirect the user to the Facebook login dialog
+      //const response = await axios.get(`http://localhost:5000/auth/facebook`); // Using your Facebook App ID
+
+    } catch (error) {
+      console.error("Error connecting with Facebook:", error);
+    } finally {
+      setIsConnecting(false);
+    }
+  };
+
+  const handleConnectButtonClick = async () => {
     setIsConnecting(true);
-
-    // Redirect the user to the Facebook login dialog
-    const response = await axios.get(`/auth/facebook?client_id=181790724922829`); // Using your Facebook App ID
-    const authUrl = response.data.authUrl;
-
-    // Redirect the user to the Facebook login dialog
-    window.location.href = authUrl;
-  } catch (error) {
-    console.error("Error connecting with Facebook:", error);
-  } finally {
+    // Simulate connecting to social media platforms
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     setIsConnecting(false);
-  }
-};
-
-const handleConnectButtonClick = async () => {
-  setIsConnecting(true);
-  // Simulate connecting to social media platforms
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  setIsConnecting(false);
-  setIsSocialMediaDialogOpen(false);
-  // You can add logic here to update state or perform other actions after successful connection
-  console.log(`Connected to ${connectingTo}`);
-};
+    setIsSocialMediaDialogOpen(false);
+    // You can add logic here to update state or perform other actions after successful connection
+    console.log(`Connected to ${connectingTo}`);
+  };
 
 
 
@@ -702,7 +703,7 @@ const handleConnectButtonClick = async () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                https://www.flipkart.com
+                https://www.yourexamplelink.com
               </Link>
               <CopyToClipboard text="https://www.flipkart.com">
                 <Button variant="outlined" color="primary" style={{ marginTop: '10px' }}>
@@ -735,30 +736,22 @@ const handleConnectButtonClick = async () => {
         </Grid>
 
 
-        <Grid item xs={6}>
-        
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => handleSocialMediaConnect('facebook')}
-          disabled={isConnecting}
-          startIcon={<Facebook />} // Add Facebook icon
-        >
-          {isConnecting ? (
-            <CircularProgress size={24} />
-          ) : (
-            'Connect with Facebook'
-          )}
-        </Button>
+        <Grid item xs={12}>
 
-        </Grid>
-
-
-
-        <Grid item xs={6}>
-          <Button variant="contained" color="primary">
-            Earn4
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleSocialMediaConnect('facebook')}
+            disabled={isConnecting}
+            startIcon={<Facebook />} // Add Facebook icon
+          >
+            {isConnecting ? (
+              <CircularProgress size={24} />
+            ) : connectedSocial ? <Button disabled>Social Connected !</Button> : (
+              'Connect with Facebook'
+            )}
           </Button>
+
         </Grid>
       </Grid>
 
